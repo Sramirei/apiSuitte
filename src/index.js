@@ -8,8 +8,8 @@ const userRoutes = require('./routes/user.routes.js')
 const productRoutes = require('./routes/product.routes.js')
 const categoryRoutes = require('./routes/category.routes.js')
 const bussinessRoutes = require('./routes/bussiness.routes.js')
-const loginRoutes = require('./routes/userLogin.routes')
-
+const userLoginRoutes = require('./routes/userLogin.routes')
+const bussinessLoginRoutes = require('./routes/bussinessLogin.routes.js')
 const Sentry = require('@sentry/node')
 const { BrowserTracing } = require('@sentry/tracing')
 const handleErrors = require('./middlewares/handleErrors.js')
@@ -44,7 +44,8 @@ app.use('/api', userRoutes)
 app.use('/api', productRoutes)
 app.use('/api', categoryRoutes)
 app.use('/api', bussinessRoutes)
-app.use('/api', loginRoutes)
+app.use('/api', userLoginRoutes)
+app.use('/api', bussinessLoginRoutes)
 
 // modulos de sentry deben declararse antes de iniciar las rutas de nuestra api.
 // RequestHandler creates a separate execution context using domains, so that every
