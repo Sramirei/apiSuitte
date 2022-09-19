@@ -4,7 +4,7 @@ const UserSchema = require('../models/user.model.js') // siempre poner la extenc
 const bcrypt = require('bcrypt')
 const router = express.Router()
 
-router.post('/login', async (req, res) => {
+router.post('/userlogin', async (req, res) => {
   const { body } = req
   const { username, password } = body
 
