@@ -17,6 +17,7 @@
     "@sentry/node": "7.8.0",
     "@sentry/tracing": "^7.8.0",
     "bcrypt": "5.0.1",
+    "cloudinary": "^1.32.0",
     "cors": "2.8.5",
     "cross-env": "7.0.3",
     "dotenv": "16.0.1",
@@ -24,7 +25,8 @@
     "jsonwebtoken": "8.5.1",
     "mongoose": "6.5.1",
     "mongoose-unique-validator": "^3.1.0",
-    "morgan": "1.10.0"
+    "morgan": "1.10.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "jest": "28.1.3",

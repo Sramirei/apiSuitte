@@ -2,19 +2,40 @@ const express = require('express')
 const UserSchema = require('../models/user.model.js') // siempre poner la extencion del archivo
 const bcrypt = require('bcrypt')
 const router = express.Router()
+const upload = require('../utils/multer.js')
+const cloudinary = require('../utils/cloudinary.js')
 
 // Create User
-router.post('/user', async (req, res, next) => {
+router.post('/user', upload.single('image'), async (req, res, next) => {
   const { body } = req
   const { username, email, password, name, address, phone, dni } = body
 
+  if (!req.file) {
+    return res.send('Por favor Selecione una foto')
+  }
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
-  const user = new UserSchema({
-    username, email, passwordHash, name, address, phone, dni, active: true, createDate: new Date(), updateDate: new Date()
-  })
   try {
+    const cloudinaryImage = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: 'Prolife Picturs Suitte'
+    })
+    const user = new UserSchema({
+      username,
+      email,
+      passwordHash,
+      name,
+      address,
+      phone,
+      dni,
+      image: {
+        public_id: cloudinaryImage.public_id,
+        url: cloudinaryImage.secure_url
+      },
+      active: true,
+      createDate: new Date(),
+      updateDate: new Date()
+    })
     const saveUser = await user.save()
     res.json(saveUser).status(201)
   } catch (error) {
@@ -28,7 +49,7 @@ router.post('/user', async (req, res, next) => {
     "name": "sebasdas23",
     "address": "calle siempre viva 123",
     "phone": "3125444532",
-    "dni": "1234545345"
+    "dni": "1234545345",
 }
 */
 

@@ -22,7 +22,11 @@ router.post('/bussnesslogin', async (req, res) => {
     id: bussiness._id,
     name: bussiness.name,
     email: bussiness.email,
-    phone: bussiness.phone
+    phone: bussiness.phone,
+    adress: bussiness.adress,
+    nit: bussiness.nit,
+    image: bussiness.image,
+    description: bussiness.description
   }
 
   const token = jwt.sign(bussinesForToken,
@@ -34,7 +38,6 @@ router.post('/bussnesslogin', async (req, res) => {
   res.status(200).json({
     name: bussiness.name,
     email: bussiness.email,
-    phone: bussiness.phone,
     token
   })
 })
