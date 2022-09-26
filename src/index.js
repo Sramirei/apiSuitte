@@ -40,6 +40,7 @@ app.use(cors())
 app.use(morgan('dev')) // este es para ver en la consola las peticiones que se estan realizando al servidor
 app.use(express.json()) // para convertir los datos que llegan a formato json
 app.use(express.urlencoded({ extended: false })) // para que pueda leer documentos json que vengan desde formularios html
+
 app.use('/api', userRoutes)
 app.use('/api', productRoutes)
 app.use('/api', categoryRoutes)

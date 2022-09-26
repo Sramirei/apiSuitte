@@ -9,26 +9,29 @@ router.post('/userlogin', async (req, res) => {
   const { username, password } = body
 
   const user = await UserSchema.findOne({ username })
-  const passworCorrect = user === null
-    ? false
-    : await bcrypt.compare(password, user.passwordHash)
+  const passworCorrect =
+    user === null ? false : await bcrypt.compare(password, user.passwordHash)
 
   if (!(user && passworCorrect)) {
     res.status(401).json({
       error: 'Invalid user or Password'
     })
   }
+
   const userForToken = {
     id: user._id,
     name: user.name,
-    username: user.username
+    username: user.username,
+    email: user.email,
+    dni: user.dni,
+    phone: user.phone,
+    address: user.address,
+    image: user.image
   }
 
-  const token = jwt.sign(userForToken,
-    process.env.SECRET, {
-      expiresIn: 60 * 60 * 24 * 7
-    }
-  )
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60 * 24 * 7
+  })
 
   res.status(200).json({
     name: user.name,

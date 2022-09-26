@@ -1,43 +1,60 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
 const BussinessSchema = require('../models/bussiness.model.js')
+const Category = require('../models/category.model.js')
 const router = express.Router()
+const upload = require('../utils/multer.js')
+const cloudinary = require('../utils/cloudinary.js')
 
 /// Create bussiness
-router.post('/bussiness', async (req, res, next) => {
+router.post('/bussiness', upload.single('image'), async (req, res, next) => {
   const { body } = req
   const { // aqui recibimos los datos que vienen en el body
     name,
-    image,
     description,
     phone,
     adress,
     email,
     password,
     nit,
-    productsId
+    productsId,
+    categoryId
   } = body
+
+  if (!req.file) {
+    return res.send('Por favor Selecione una foto')
+  }
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
   // aqui vienen los datos que se van a gurdar en la base de datos.
-  const bussiness = new BussinessSchema({
-    name,
-    image,
-    description,
-    phone,
-    adress,
-    email,
-    passwordHash,
-    nit,
-    productsId,
-    active: true,
-    createDate: new Date(),
-    updateDate: new Date()
-  })
 
   try {
+    const cloudinaryImage = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: 'Prolife Picturs Suitte'
+    })
+
+    const category = await Category.findById(categoryId)
+
+    const bussiness = new BussinessSchema({
+      name,
+      image: {
+        public_id: cloudinaryImage.public_id,
+        url: cloudinaryImage.secure_url
+      },
+      description,
+      phone,
+      adress,
+      email,
+      passwordHash,
+      nit,
+      productsId,
+      categoryId: category.id,
+      active: true,
+      createDate: new Date(),
+      updateDate: new Date()
+    })
     const saveBussiness = await bussiness.save() // aqui estamos generando el documento con la nueva empesa.
 
     res.json(saveBussiness)
@@ -47,13 +64,14 @@ router.post('/bussiness', async (req, res, next) => {
 }) /* http://localhost:3001/api/bussiness
 { este es objeto que tenemos que pasarle para poder crear una empresa.
     "name": "super ",
-    "image": "imagen de prueba",
+    "image": "selecionar imagen del equipo",
     "description": "Prueba de bussines",
     "phone": "31276455455",
     "adress": "calle siempre viva 123",
     "email": "prueba7@gmail.com",
     "password": "cualqueircosa",
-    "nit": "242423424-7"
+    "nit": "242423424-7",
+    "categoryId": "el id de la categoria"
 } */
 
 // Get all bussiness
@@ -77,7 +95,7 @@ router.get('/bussiness/:id', async (req, res, next) => {
   }
 }) // http://localhost:3001/api/bussiness/id que se busca => url para el endpoint
 
-// PUT(actualizar) bussiness
+// PUT(actualizar) bussiness --> hay que envairle siempre un json para actualziar
 router.put('/bussiness/:id', async (req, res, next) => {
   const { id } = req.params
   const {

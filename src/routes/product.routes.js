@@ -1,47 +1,52 @@
 const express = require('express')
 const ProductSchema = require('../models/product.models.js')
 const Bussiness = require('../models/bussiness.model.js')
-const Category = require('../models/category.model.js')
 const router = express.Router()
+const upload = require('../utils/multer.js')
+const cloudinary = require('../utils/cloudinary.js')
+const bussinessExtractor = require('../middlewares/bussinesExtractor.js')
 
 /// Create product
-router.post('/product', async (req, res, next) => {
+router.post('/product', upload.single('image'), bussinessExtractor, async (req, res, next) => {
   const { body } = req
   const { // aqui recibimos los datos que vienen en el body
     name,
     price,
     amount,
     description,
-    image,
-    categoryId,
     businessId
   } = body
 
-  const bussiness = await Bussiness.findById(businessId) // aqui estoy recuperando la empresa a la cual al cual pertenece este producto.
-  const category = await Category.findById(categoryId)
+  if (!req.file) {
+    return res.send('Por favor Selecione una foto')
+  }
 
-  // aqui vienen los datos que se van a gurdar en la base de datos.
-  const product = new ProductSchema({
-    name,
-    price,
-    amount,
-    description,
-    image,
-    categoryId: category._id,
-    businessId: bussiness._id,
-    active: true,
-    createDate: new Date(),
-    updateDate: new Date()
-  })
+  const bussiness = await Bussiness.findById(businessId) // aqui estoy recuperando la empresa a la cual al cual pertenece este producto.
 
   try {
+    const cloudinaryImage = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: 'Prolife Picturs Suitte'
+    })
+    // aqui vienen los datos que se van a gurdar en la base de datos.
+    const product = new ProductSchema({
+      name,
+      price,
+      amount,
+      description,
+      image: {
+        public_id: cloudinaryImage.public_id,
+        url: cloudinaryImage.secure_url
+      },
+      businessId: bussiness._id,
+      active: true,
+      createDate: new Date(),
+      updateDate: new Date()
+    })
     const saveProduct = await product.save() // aqui estamos generando el documento con la nueva empesa.
 
     bussiness.productsId = bussiness.productsId.concat(saveProduct._id)// aqui estamos asignando el id de las empresa a su respectivo producto( se concatena con los otras posibles id que pueda tener)
-    category.productsId = category.productsId.concat(saveProduct._id)
 
     await bussiness.save()
-    await category.save()
 
     res.json(saveProduct)
   } catch (error) {
@@ -53,8 +58,7 @@ router.post('/product', async (req, res, next) => {
     "price": 2000,
     "amount": 100,
     "description": "Productos de preuba",
-    "image": "imagen de prueba",
-    "categoryId" : "id de la categoria",
+    "image": "selecione una imagen",
     "businessId" : "id de la empresa",
 } */
 
@@ -68,11 +72,8 @@ router.get('/product', async (req, res, next) => {
       adress: 1,
       email: 1,
       _id: 0
-    }).populate('categoryId', {
-      name: 1,
-      description: 1,
-      _id: 0
     })
+
     res.json(product)
   } catch (error) {
     next(error)
@@ -90,10 +91,6 @@ router.get('/product/:id', async (req, res, next) => {
       adress: 1,
       email: 1,
       _id: 0
-    }).populate('categoryId', {
-      name: 1,
-      description: 1,
-      _id: 0
     })
     res.json(product)
   } catch (error) {
@@ -102,7 +99,7 @@ router.get('/product/:id', async (req, res, next) => {
 }) // http://localhost:3001/api/product/id que se busca => url para el endpoint
 
 // PUT(actualizar) product
-router.put('/product/:id', async (req, res, next) => {
+router.put('/product/:id', bussinessExtractor, async (req, res, next) => {
   const { id } = req.params
   const {
     name,
@@ -110,7 +107,6 @@ router.put('/product/:id', async (req, res, next) => {
     amount,
     description,
     image,
-    categoryId,
     businessId,
     active,
     createDate
@@ -124,7 +120,6 @@ router.put('/product/:id', async (req, res, next) => {
           amount,
           description,
           image,
-          categoryId,
           businessId,
           active,
           createDate,
@@ -140,7 +135,7 @@ router.put('/product/:id', async (req, res, next) => {
 })
 
 // Delete product
-router.delete('/product/:id', async (req, res, next) => {
+router.delete('/product/:id', bussinessExtractor, async (req, res, next) => {
   try {
     const { id } = req.params
     await ProductSchema

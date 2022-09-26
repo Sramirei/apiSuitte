@@ -9,10 +9,9 @@ const productSchema = new Schema({
   price: Number,
   amount: Number,
   description: String,
-  image: String,
-  categoryId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Category'
+  image: {
+    public_id: String,
+    url: String
   },
   businessId: {
     type: Schema.Types.ObjectId,

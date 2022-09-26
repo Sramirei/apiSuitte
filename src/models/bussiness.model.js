@@ -6,7 +6,10 @@ const bussinessSchema = new Schema({
     type: String,
     unique: true
   },
-  image: String,
+  image: {
+    public_id: String,
+    url: String
+  },
   description: String,
   phone: {
     type: String,
@@ -31,6 +34,11 @@ const bussinessSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Product'
   }],
+  categoryId:
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Category'
+    },
   active: Boolean,
   createDate: Date,
   updateDate: Date

@@ -6,13 +6,15 @@ const categorySchema = new Schema({
     type: String,
     unique: true
   },
-  image: String,
+  image: {
+    public_id: String,
+    url: String
+  },
   description: String,
-  productsId: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Product'
-    }],
+  bussinessId: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Bussiness'
+  }],
   active: Boolean,
   createDate: Date,
   updateDate: Date
