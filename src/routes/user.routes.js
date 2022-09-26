@@ -50,6 +50,7 @@ router.post('/user', upload.single('image'), async (req, res, next) => {
     "address": "calle siempre viva 123",
     "phone": "3125444532",
     "dni": "1234545345",
+    "image": "cargar la foto"
 }
 */
 

@@ -1,18 +1,36 @@
 const express = require('express')
 const CategorySchema = require('../models/category.model.js')
 const router = express.Router()
+const upload = require('../utils/multer.js')
+const cloudinary = require('../utils/cloudinary.js')
 
 /// Create category
-router.post('/category', async (req, res, next) => {
+router.post('/category', upload.single('image'), async (req, res, next) => {
   const { body } = req
   const {
-    name, image, description, productsId
+    name, description, bussinessId
   } = body
 
-  const category = new CategorySchema({
-    name, image, description, productsId, active: true, createDate: new Date(), updateDate: new Date()
-  })
+  if (!req.file) {
+    return res.send('Por favor Selecione una foto')
+  }
+
   try {
+    const cloudinaryImage = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: 'Prolife Picturs Suitte'
+    })
+    const category = new CategorySchema({
+      name,
+      image: {
+        public_id: cloudinaryImage.public_id,
+        url: cloudinaryImage.secure_url
+      },
+      description,
+      bussinessId,
+      active: true,
+      createDate: new Date(),
+      updateDate: new Date()
+    })
     const saveCategory = await category.save()
     res.json(saveCategory)
   } catch (error) {
@@ -21,7 +39,7 @@ router.post('/category', async (req, res, next) => {
 }) /* http://localhost:9000/api/category
 {
     "name":"foods",
-    "image": "imagen prueba",
+    "image": "selecione una imagen",
     "description": "prueba de crar categoria"
 } */
 
@@ -46,7 +64,7 @@ router.get('/category/:id', async (req, res, next) => {
   }
 }) // http://localhost:3001/api/category/id que se busca => url para el endpoint
 
-// PUT(actualizar) category
+// PUT(actualizar) category --> de le debe enviar solo json para hacer la actualizacion
 router.put('/category/:id', async (req, res, next) => {
   const { id } = req.params
   const {
