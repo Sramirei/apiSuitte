@@ -4,9 +4,10 @@ const Bussiness = require('../models/bussiness.model.js')
 const router = express.Router()
 const upload = require('../utils/multer.js')
 const cloudinary = require('../utils/cloudinary.js')
+const bussinessExtractor = require('../middlewares/bussinesExtractor.js')
 
 /// Create product
-router.post('/product', upload.single('image'), async (req, res, next) => {
+router.post('/product', upload.single('image'), bussinessExtractor, async (req, res, next) => {
   const { body } = req
   const { // aqui recibimos los datos que vienen en el body
     name,
@@ -98,7 +99,7 @@ router.get('/product/:id', async (req, res, next) => {
 }) // http://localhost:3001/api/product/id que se busca => url para el endpoint
 
 // PUT(actualizar) product
-router.put('/product/:id', async (req, res, next) => {
+router.put('/product/:id', bussinessExtractor, async (req, res, next) => {
   const { id } = req.params
   const {
     name,
@@ -134,7 +135,7 @@ router.put('/product/:id', async (req, res, next) => {
 })
 
 // Delete product
-router.delete('/product/:id', async (req, res, next) => {
+router.delete('/product/:id', bussinessExtractor, async (req, res, next) => {
   try {
     const { id } = req.params
     await ProductSchema

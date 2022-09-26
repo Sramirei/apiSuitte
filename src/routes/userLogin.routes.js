@@ -25,7 +25,8 @@ router.post('/userlogin', async (req, res) => {
     email: user.email,
     dni: user.dni,
     phone: user.phone,
-    address: user.address
+    address: user.address,
+    image: user.image
   }
 
   const token = jwt.sign(userForToken, process.env.SECRET, {

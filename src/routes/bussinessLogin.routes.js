@@ -26,7 +26,9 @@ router.post('/bussnesslogin', async (req, res) => {
     adress: bussiness.adress,
     nit: bussiness.nit,
     image: bussiness.image,
-    description: bussiness.description
+    description: bussiness.description,
+    productsId: bussiness.productsId,
+    categoryId: bussiness.categoryId
   }
 
   const token = jwt.sign(bussinesForToken,
